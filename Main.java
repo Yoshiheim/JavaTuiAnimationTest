@@ -1,111 +1,75 @@
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
-import java.util.*;
+import javax.swing.SwingUtilities;
 
-public class Main extends JFrame implements Runnable{
-	//public static ArrayList<JLabel> labels = new ArrayList<JLabel>();
-	public static int time = 0;
-	public static int stat = 0;
- 	/*
-	public static void DrawWall(JFrame frame, Point point){
-		for(int i = 0; i < point.x; i++){
-			for(int y = 0; y < point.y; y++){
-				int d = i;
-				JLabel label = new JLabel("#");
-				label.setOpaque(false);
-				label.setForeground(new Color(d,d,d));
-				int y2 = (i*10) % 5;
-				if(i % 5 == 0){
-					label.setBounds(i*10,y2, i*10, 50);
-				}else{
-					label.setBounds(i*10,y*10, i*10, 50);
+public class Main implements Runnable{
+	private static int time = 0;
+	private static int timeD = 0;
+	private static int getTerminalProperty(String command) {
+		try {
+			Process process = new ProcessBuilder("/bin/sh", "-c", command + " </dev/tty").start();
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+				String line = reader.readLine();
+				if (line != null) {
+					return Integer.parseInt(line.trim());
 				}
-				labels.add(label);
-				frame.add(label);
-			
-				//label.setBounds(i*15-(y*5),y*10-(point.x*5), i*10-(y*5), 50);
-				//labels.add(label);
 			}
+		} catch (Exception e) {
+			// Fallback default value if not running in a real interactive terminal
 		}
+		return 80; // Standard fallback default
 	}
-	*/ 
+	
+	private static String word = "HELLO WORLD";
+	private static String text = "";
+	private static String sprite = "|;:,. ";
 
+	private static String Message = "@Yoshiheim";
+
+	private static int columns = getTerminalProperty("tput cols");
+	private static int rows = getTerminalProperty("tput lines");
 	@Override
 	public void run(){
 		while(this != null){
 			time++;
+			if (time%3 == 0){
+				timeD++;
+			}
+			if(timeD%2==0){
+				timeD+=timeD;
+			}
+			for(int i = 1; i < 4; i++){
 
-			String text = "";
-				for(int x = 1; x < 20; x++){
-					for(int y = 1; y < 20; y++){
-						if(x == y + (int)(Math.sin(time)*stat)){
-							text += "\033[43m \033[0m";
-						}else if(y-10*3/x+y == (int)(Math.cos(time)*x)*3/x+y){
-							text += String.format("\033[%dm \033[0m", (y % 10));	
-						}else{
-							text += "\033[44m \033[0m";	
-						}
-					}
-					text += "\n";
+			for(int x = 1; x < rows; x++){
+				for(int y = 1; y < columns; y++){
+					if(y-(time%x)>0&&y-(time%10)<x*i&&x-y-(time%10)>0){
+						text += "\033[30;45m\033[30m"+word.charAt((x-y+(timeD%10))/(word.length()*(x+y+(time%10))))+"\033[00m";
+					}else if(x == 3&&y > Message.length()) {
+						text += Message.charAt((x+y)%Message.length());
+					}else if(x < y){
+						text += String.format("\033[30;42m%c\033[00m", sprite.charAt(((time%3)+x*y-(time%2))%sprite.length()));
+					}else{
+						text += " ";
+					}	
 				}
 				text += "\n";
+			}
+			text += "\n";
+			}
 	
 			System.out.printf("%s\n", text);
 			text = "";
 			try{
-				Thread.sleep(100);
+				Thread.sleep(16);
 			}catch(Exception e){
 				Thread.currentThread().interrupt();
 			}	
 		}
 	}
 	
-	public Main(){	
-
+	public Main(){
 		new Thread(this).start();
-	
-		/*
-		for(int x = 0; x < 100; x++){
-				
-			JCheckBox box = new JCheckBox();
-		
-			box.setSize(30,30);
-			int y = x % 5;
-			int y2 = y % 3;
-			int y3 = y2 % 2;
-			if(x % 2 == 0){
-				box.setLocation(10*y3,30*x);
-				for(int i = 1; i < 20; i++){
-					JLabel box2 = new JLabel("$");
-					box2.setLocation(10*y3,30*x*i);
-					box2.setSize(20, 20);
-					this.add(box2);
-				}
-			}else{
-				box.setLocation(30*y,30*x);
-			}
-		
-	
-			box.addItemListener(e -> {
-				if(e.getStateChange() == ItemEvent.SELECTED){
-					stat += 2; 
-				}else {
-					stat -= 2;
-				}	
-			});
-
-			this.add(box);
-		}
-		for(int d = 0; d < 3; d++){
-			DrawWall(this, new Point(10+d*10,10+d*10));
-		}
-		
-		
-		this.setVisible(true);
-		this.setSize(500, 500);
-		*/
 	}
 
 	public static void main(String[] args){
