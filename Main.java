@@ -36,21 +36,22 @@ public class Main extends JFrame implements Runnable{
 	public void run(){
 		while(this != null){
 			time++;
-
+			
+			String word = ";:',. ";
 			String text = "";
-				for(int x = 1; x < 20; x++){
-					for(int y = 1; y < 20; y++){
-						if(x == y + (int)(Math.sin(time)*stat)){
-							text += "\033[43m \033[0m";
-						}else if(x/y < y/(int)((Math.sin(time)*2)+10)){
-							text += "\033[40m \033[0m";	
-						}else{
-							text += "\033[44m \033[0m";	
-						}
+			for(int x = 1; x < 20; x++){
+				for(int y = 1; y < 20; y++){
+					if (0.1 >= Math.sin(time*20) && x == 1){
+						text += "\033[44m \033[0m";	
+					}else if(x%word.length() >= time%word.length()){
+						text += word.charAt(x%word.length());
+					}else{
+						text += " ";	
 					}
-					text += "\n";
 				}
 				text += "\n";
+			}
+			text += "\n";
 	
 			System.out.printf("%s\n", text);
 			text = "";
@@ -62,8 +63,7 @@ public class Main extends JFrame implements Runnable{
 		}
 	}
 	
-	public Main(){	
-
+	public Main(){
 		new Thread(this).start();
 	
 		/*
