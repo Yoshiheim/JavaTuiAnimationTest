@@ -42,8 +42,8 @@ public class Main extends JFrame implements Runnable{
 					for(int y = 1; y < 20; y++){
 						if(x == y + (int)(Math.sin(time)*stat)){
 							text += "\033[43m \033[0m";
-						}else if(y-10*3/x+y == (int)(Math.cos(time)*x)*3/x+y){
-							text += String.format("\033[%dm \033[0m", (y % 10));	
+						}else if(x/y < y/(int)((Math.sin(time)*2)+10)){
+							text += "\033[40m \033[0m";	
 						}else{
 							text += "\033[44m \033[0m";	
 						}
